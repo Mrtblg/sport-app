@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Link } from 'react-router-dom';
 import { css, withStyles } from '../skeleton/ressources/with-styles';
 
 /**
@@ -11,25 +11,28 @@ import { css, withStyles } from '../skeleton/ressources/with-styles';
  * this item can also be used for different purposes
  * see props.type for more details
  */
-const ListItem = ({ labels, type, link, styles }) => {
-  const labelsView =  labels.map(label => (
-    <div key={label} {...css(styles.label)} >{label}</div>
+const ListItem = ({
+  labels,
+  type,
+  link,
+  styles,
+}) => {
+  const labelsView = labels.map(label => (
+    <div key={label} {...css(styles.label)}>{label}</div>
   ));
-  
   const typeStyle = styles[type];
   if (link !== undefined) {
     return (
-      <Link to={link} {...css([styles.container, typeStyle])} >
+      <Link to={link} {...css([styles.container, typeStyle])}>
         {labelsView}
       </Link>
     );
-  } else {
-    return (
-      <div {...css([styles.container, typeStyle])} >
-        {labelsView}
-      </div>
-    );
   }
+  return (
+    <div {...css([styles.container, typeStyle])}>
+      {labelsView}
+    </div>
+  );
 };
 
 ListItem.propTypes = {
@@ -41,6 +44,7 @@ ListItem.propTypes = {
 
 ListItem.defaultProps = {
   type: 'std',
+  link: undefined,
 };
 
 export default withStyles(({ color, margin, fontSize }) => ({

@@ -7,14 +7,12 @@ import ListItem from '../../bricks/list-item';
  * Display a representation of a team for a list
  * on click navigate to the team page
  */
-const Team = ({ name, creationYear, id }) => {
-  return (
-    <ListItem
-      labels={[ name, creationYear ]}
-      link={`/team/${id}`}
-    />
-  );
-};
+const Team = ({ name, creationYear, id }) => (
+  <ListItem
+    labels={[name, creationYear]}
+    link={`/team/${id}`}
+  />
+);
 
 Team.propTypes = {
   name: PropTypes.string, // Name of the team

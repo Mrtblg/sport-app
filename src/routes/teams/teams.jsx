@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Team from './team';
 import PropTypes from 'prop-types';
 import { css, withStyles } from '../../skeleton/ressources/with-styles';
 import thesportdbQueryService from '../../skeleton/services/thesportdb-query.service';
+import Team from './team';
 import ListItem from '../../bricks/list-item';
 import Title from '../../bricks/title';
 
@@ -20,7 +20,7 @@ class Teams extends Component {
   static parseAPIData(data) {
     const teams = data.teams.map(team => ({
       name: team.strTeam,
-      creationYear: parseInt(team.intFormedYear),
+      creationYear: parseInt(team.intFormedYear, 10),
       uniqId: team.idTeam,
     }));
     teams.sort((teamA, teamB) => (teamA.creationYear > teamB.creationYear ? 1 : -1));
@@ -39,9 +39,7 @@ class Teams extends Component {
     thesportdbQueryService.query({
       url: 'search_all_teams.php?l=English%20Premier%20League',
     }).then((response) => {
-      this.setState({
-        teams: Teams.parseAPIData(response)
-      });
+      this.setState({ teams: Teams.parseAPIData(response) });
     });
   }
 
@@ -58,20 +56,20 @@ class Teams extends Component {
       );
     }
 
-    const teamsVue = teams.map(team => 
+    const teamsVue = teams.map(team => (
       <Team
         key={team.uniqId}
         name={team.name}
         creationYear={team.creationYear}
         id={team.uniqId}
       />
-    );
+    ));
     return (
       <div {...css(styles.container)}>
-        <Title label='Liste des équipes'/>
+        <Title label="Liste des équipes" />
         <ListItem
-          labels={[ 'Nom de l\'équipe', 'Date de création' ]}
-          type='header'
+          labels={['Nom de l\'équipe', 'Date de création']}
+          type="header"
         />
         {teamsVue}
       </div>

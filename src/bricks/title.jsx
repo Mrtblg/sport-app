@@ -1,25 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { css, withStyles } from '../skeleton/ressources/with-styles';
 
 /**
  * Displays a title
  */
-const Title = ({ label, styles }) => {
-  return (
-    <div {...css(styles.label)}>
-      {label}
-    </div>
-  );
-};
+const Title = ({ label, styles }) => (
+  <div {...css(styles.label)}>
+    {label}
+  </div>
+);
 
 Title.propTypes = {
   label: PropTypes.string.isRequired, // label of the title
-  styles: PropTypes.object.isRequired,
+  styles: PropTypes.style.isRequired,
 };
 
-export default withStyles(({ color, margin, fontSize, fontWeight }) => ({
+export default withStyles(({
+  color,
+  margin,
+  fontSize,
+  fontWeight,
+}) => ({
   label: {
     padding: `${margin.std} ${margin.L}`,
     fontSize: fontSize.L,

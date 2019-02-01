@@ -30,5 +30,5 @@ export default {
     S: '5px',
     L: '15px',
     XL: '20px',
-  }
+  },
 };

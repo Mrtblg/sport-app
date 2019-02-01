@@ -8,7 +8,6 @@ import Title from '../../bricks/title';
  * Display and allow edition on player info
  */
 class PlayerFile extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -21,13 +20,14 @@ class PlayerFile extends Component {
   }
 
   /** fetch player info */
-  componentWillMount() {    
-    this.fetchPlayerInfo()
+  componentWillMount() {
+    this.fetchPlayerInfo();
   }
 
   /** check if route changed, if so fetch new player info */
   componentDidUpdate(prevProps) {
-    if (this.props.location !== prevProps.location) {
+    const { location } = this.props;
+    if (location !== prevProps.location) {
       this.fetchPlayerInfo();
     }
   }
@@ -40,14 +40,14 @@ class PlayerFile extends Component {
   */
   fetchPlayerInfo() {
     const { playerId } = this.props.match.params
-    if (playerId === "create") {
+    if (playerId === 'create') {
       this.setState({
         name: '',
         height: '',
       });
       this.props.selectedPlayerCallback(undefined);
     } else {
-      const { fetchPlayerById } = this.props
+      const { fetchPlayerById } = this.props;
       this.setState(fetchPlayerById(playerId));
       this.props.selectedPlayerCallback(playerId);
     }
@@ -59,9 +59,9 @@ class PlayerFile extends Component {
    * @todo make API call
    */
   deletePlayer() {
-    const { playerId } = this.props.match.params
+    const { playerId } = this.props.match.params;
     // todo delete player remotely API call and continue once API acked
-    this.props.deletePlayer(playerId, true)
+    this.props.deletePlayer(playerId, true);
   }
 
   /**
@@ -99,9 +99,9 @@ class PlayerFile extends Component {
    * @todo validate fields properly
    */
   handlePlayerEdit(value, key) {
-    const updatedState = {}
-    updatedState[key] = value
-    this.setState(updatedState)
+    const updatedState = {};
+    updatedState[key] = value;
+    this.setState(updatedState);
   }
 
   /**
@@ -111,44 +111,45 @@ class PlayerFile extends Component {
   render() {
     const { name, height } = this.state;
     const { styles } = this.props;
-    
-    return(
+    return (
       <div {...css(styles.container)}>
-        <Title label='Fiche du joueur'/>
+        <Title label="Fiche du joueur" />
         <div>
           {name}
         </div>
         <div>
           {height}
         </div>
-        <br></br>
+        <br />
         <form onSubmit={this.savePlayer}>
           <div>
-            <label>
+            <label htmlFor="name">
               Nom complet :
               <input
+                id="name"
                 type="text"
                 value={name}
-                onChange={(evt) => this.handlePlayerEdit(evt.target.value, 'name')}
+                onChange={evt => this.handlePlayerEdit(evt.target.value, 'name')}
               />
             </label>
           </div>
           <div>
-            <label>
+            <label htmlFor="height">
               Taille (en cm):
               <input
+                id="height"
                 type="text"
                 value={height}
-                onChange={(evt) => this.handlePlayerEdit(evt.target.value, 'height')}
+                onChange={evt => this.handlePlayerEdit(evt.target.value, 'height')}
               />
             </label>
           </div>
           <input type="submit" value="Submit" {...css(styles.submitButton)} />
         </form>
-        <br></br>
+        <br />
         <div {...css(styles.buttonsContainer)}>
-          <Button label='Supprimer' onPress={this.deletePlayer} type='warning'/>
-          <Button label='Enregistrer' onPress={this.savePlayer}/>        
+          <Button label="Supprimer" onPress={this.deletePlayer} type="warning" />
+          <Button label="Enregistrer" onPress={this.savePlayer} />
         </div>
       </div>
     );
@@ -161,8 +162,18 @@ PlayerFile.propTypes = {
   updatePlayer: PropTypes.func.isRequired, // Callback to update the player
   deletePlayer: PropTypes.func.isRequired, // Callback to delete the player
   selectedPlayerCallback: PropTypes.func, // Callback to inform about the selected Player
-  styles: PropTypes.object.isRequired,
-}
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      teamId: PropTypes.node,
+      playerId: PropTypes.node,
+    }).isRequired,
+  }).isRequired,
+  location: PropTypes.string.isRequired,
+};
+
+PlayerFile.defaultProps = {
+  selectedPlayerCallback: () => {},
+};
 
 export default withStyles(({ margin }) => ({
   container: {

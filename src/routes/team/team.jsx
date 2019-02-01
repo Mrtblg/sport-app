@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { css, withStyles } from '../../skeleton/ressources/with-styles';
 import thesportdbQueryService from '../../skeleton/services/thesportdb-query.service';
@@ -20,21 +20,21 @@ class Team extends Component {
    * @returns {Array} the array of players sorted
    */
   static parseAPIData(data) {
-    const players =  data.player.map((player) => {
+    const players = data.player.map((player) => {
       return Team.parsePlayer({
         name: player.strPlayer,
         height: player.strHeight,
         uniqId: player.idPlayer,
         teamId: player.idTeam,
-      })
+      });
     });
-    Team.sortPlayers(players)
+    Team.sortPlayers(players);
     return players;
   }
 
   /**
    * sort the players based on theire height
-   * @param {Array} players 
+   * @param {Array} players
    */
   static sortPlayers(players) {
     players.sort((playerA, playerB) => (playerA.height > playerB.height ? 1 : -1));
@@ -46,13 +46,13 @@ class Team extends Component {
    * @return {Object} the parsed player
    */
   static parsePlayer(player) {
-    player.height = player.height.toString() //ensure we have a String
+    const playerHeightString = player.height.toString(); // ensure we have a String
     return {
       name: player.name,
-      height: parseInt(player.height.replace('.','')),
+      height: parseInt(playerHeightString.replace('.', ''), 10),
       uniqId: player.uniqId,
       teamId: player.teamId,
-    }
+    };
   }
 
   constructor(props) {
@@ -74,7 +74,7 @@ class Team extends Component {
       url: `lookup_all_players.php?id=${teamId}`,
     }).then((response) => {
       this.setState({
-        players: Team.parseAPIData(response)
+        players: Team.parseAPIData(response),
       });
     });
   }
@@ -88,35 +88,33 @@ class Team extends Component {
   fetchPlayerById(playerId) {
     let playerResult;
     this.state.players.forEach((player) => {
-      if (player.uniqId == playerId) {
+      if (player.uniqId === playerId) {
         playerResult = player;
       }
-    })
+    });
     return playerResult;
   }
 
   /**
    * Parse the incomming playerData
    * Updates the array of players and sort them once again
-   * @param {String} playerId 
+   * @param {String} playerId
    * @param {Object} playerData containing only data handled by playerFile
    */
   updatePlayer(playerId, playerData) {
-    const newPlayers = []
-    this.state.players.forEach((player, index) => {
-      if (player.uniqId != playerId) {
-        newPlayers.push(player)
+    const newPlayers = [];
+    this.state.players.forEach((player) => {
+      if (player.uniqId !== playerId) {
+        newPlayers.push(player);
+      } else {
+        const newPlayer = Object.assign({}, player);
+        newPlayer.name = playerData.name;
+        newPlayer.height = playerData.height;
+        newPlayers.push(Team.parsePlayer(newPlayer));
       }
-      else {
-        player.name = playerData.name;
-        player.height = playerData.height;
-        newPlayers.push(Team.parsePlayer(player));
-      }
-    })
+    });
     Team.sortPlayers(newPlayers);
-    this.setState({
-      players: newPlayers
-    })
+    this.setState({ players: newPlayers });
   }
 
   /**
@@ -127,25 +125,22 @@ class Team extends Component {
    * @param {Boolean} isCurrentPlayer // tels if we neeed to navigate to next player
    */
   deletePlayer(playerId, isCurrentPlayer) {
-    const newPlayers = []
-    let playerIndex
+    const newPlayers = [];
+    let playerIndex;
     this.state.players.forEach((player, index) => {
-      if (player.uniqId != playerId) {
-        newPlayers.push(player)
-      }
-      else {
+      if (player.uniqId !== playerId) {
+        newPlayers.push(player);
+      } else {
         playerIndex = index;
       }
-    })
-    this.setState({
-      players: newPlayers
-    })
+    });
+    this.setState({ players: newPlayers });
     // navigate to next player in list if needed
     if (isCurrentPlayer) {
-      const { teamId } = this.props.match.params
-      const newPlayer = playerIndex < newPlayers.length ?
-        newPlayers[playerIndex] : newPlayers[newPlayers.length - 1]
-      this.props.history.push(`/team/${teamId}/${newPlayer.uniqId}`)
+      const { teamId } = this.props.match.params;
+      const newPlayer = playerIndex < newPlayers.length
+        ? newPlayers[playerIndex] : newPlayers[newPlayers.length - 1];
+      this.props.history.push(`/team/${teamId}/${newPlayer.uniqId}`);
     }
   }
 
@@ -157,17 +152,15 @@ class Team extends Component {
    */
   createPlayer(player) {
     const newPlayers = [Team.parsePlayer(player)].concat(this.state.players)
-    Team.sortPlayers(newPlayers)
-    this.setState({
-      players: newPlayers
-    })
-    this.props.history.push(`/team/${this.props.match.params.teamId}/${player.uniqId}`)
+    Team.sortPlayers(newPlayers);
+    this.setState({ players: newPlayers });
+    this.props.history.push(`/team/${this.props.match.params.teamId}/${player.uniqId}`);
   }
 
   /**
    * Stores the selected playerId in the state
    * usefull to display the selected plyer in the list
-   * @param {String} playerId 
+   * @param {String} playerId
    */
   selectedPlayerCallback(playerId) {
     this.setState({ selectedPlayerId: playerId });
@@ -177,7 +170,6 @@ class Team extends Component {
     const { players, selectedPlayerId } = this.state;
     const { styles } = this.props;
     const { teamId } = this.props.match.params;
-    
     // display a not found message if the list of players is empty
     if (players === undefined || players.length === 0) {
       return (
@@ -187,7 +179,7 @@ class Team extends Component {
       );
     }
 
-    const playersVue = players.map(player =>
+    const playersVue = players.map(player => (
       <Player
         key={player.uniqId}
         name={player.name}
@@ -196,28 +188,28 @@ class Team extends Component {
         teamId={player.teamId}
         selectedPlayerId={selectedPlayerId}
       />
-    );
+    ));
     return (
       <div {...css(styles.container)}>
         <div {...css(styles.list)}>
-          <Title label='Liste des joueurs'/>
+          <Title label="Liste des joueurs" />
           <ListItem
-            labels={[ 'Nom complet', 'taille (en cm)' ]}
-            type='header'
+            labels={['Nom complet', 'taille (en cm)']}
+            type="header"
           />
           <ListItem
-            labels={[ 'Ajouter un joueur' ]}
-            type='button'
+            labels={['Ajouter un joueur']}
+            type="button"
             link={`/team/${teamId}/create`}
           />
           {playersVue}
         </div>
-        <div {...css(styles.detailsPage)} >
+        <div {...css(styles.detailsPage)}>
           <Route
             path="/team/:teamId/:playerId"
             render={
               (props) => {
-                return(
+                return (
                   <PlayerFile
                     {...props}
                     fetchPlayerById={this.fetchPlayerById}
@@ -237,6 +229,11 @@ class Team extends Component {
 }
 
 Team.propTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      teamId: PropTypes.node,
+    }).isRequired,
+  }).isRequired,
   styles: PropTypes.object.isRequired,
 };
 
@@ -250,5 +247,5 @@ export default withStyles(() => ({
   detailsPage: {
     flex: '0 0 50%',
     boxSizing: 'border-box',
-  }
+  },
 }))(Team);

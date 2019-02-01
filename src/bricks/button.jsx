@@ -1,15 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { css, withStyles } from '../skeleton/ressources/with-styles';
 
 /**
  * Display a button
  */
-const Button = ({ label, onPress, type, styles }) => {
-  const typeStyle = styles[type]
+const Button = ({
+  label,
+  onPress,
+  type,
+  styles,
+}) => {
+  const typeStyle = styles[type];
   return (
-    <div {...css([styles.button, typeStyle])} onClick={onPress}>
+    <div {...css([styles.button, typeStyle])} onClick={onPress} role="button" tabIndex={0} onKeyDown={onPress}>
       <div {...css(styles.label)}>
         {label}
       </div>
@@ -42,5 +46,5 @@ export default withStyles(({ color, margin, fontSize }) => ({
   },
   warning: {
     backgroundColor: color.warning,
-  }
+  },
 }))(Button);

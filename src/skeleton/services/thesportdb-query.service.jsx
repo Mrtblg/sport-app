@@ -18,7 +18,7 @@ const thesportdbQueryService = {
       method: method === undefined ? 'get' : method,
       url: `https://www.thesportsdb.com/api/v1/json/1/${url}`,
       data: options.data,
-    }).then(response => response.data)
+    }).then(response => response.data);
   },
 };
 
