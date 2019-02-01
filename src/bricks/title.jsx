@@ -13,7 +13,7 @@ const Title = ({ label, styles }) => (
 
 Title.propTypes = {
   label: PropTypes.string.isRequired, // label of the title
-  styles: PropTypes.style.isRequired,
+  styles: PropTypes.object.isRequired,
 };
 
 export default withStyles(({

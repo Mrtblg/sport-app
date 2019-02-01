@@ -39,17 +39,18 @@ class PlayerFile extends Component {
    * selecteed playerId
   */
   fetchPlayerInfo() {
-    const { playerId } = this.props.match.params
+    const { match: { params: { playerId } } } = this.props;
+    const { selectedPlayerCallback } = this.props;
     if (playerId === 'create') {
       this.setState({
         name: '',
         height: '',
       });
-      this.props.selectedPlayerCallback(undefined);
+      selectedPlayerCallback(undefined);
     } else {
       const { fetchPlayerById } = this.props;
       this.setState(fetchPlayerById(playerId));
-      this.props.selectedPlayerCallback(playerId);
+      selectedPlayerCallback(playerId);
     }
   }
 
@@ -59,9 +60,10 @@ class PlayerFile extends Component {
    * @todo make API call
    */
   deletePlayer() {
-    const { playerId } = this.props.match.params;
+    const { match: { params: { playerId } } } = this.props;
+    const { deletePlayer } = this.props;
     // todo delete player remotely API call and continue once API acked
-    this.props.deletePlayer(playerId, true);
+    deletePlayer(playerId, true);
   }
 
   /**
@@ -72,20 +74,26 @@ class PlayerFile extends Component {
    */
   savePlayer() {
     // todo create player remotely API call get ID returned by API
-    const { teamId, playerId } = this.props.match.params;
+    const {
+      match: {
+        params: { teamId, playerId },
+      },
+      createPlayer,
+      updatePlayer,
+    } = this.props;
     const { name, height } = this.state;
     if (playerId === 'create') {
       // todo create player remotely API call get ID returned by API
-      const simulatedId = Math.floor(Math.random() * Math.floor(10000)).toString()
+      const simulatedId = Math.floor(Math.random() * Math.floor(10000)).toString();
       const newPlayer = {
         name: name,
         height: height,
         uniqId: simulatedId,
         teamId: teamId,
-      }
-      this.props.createPlayer(newPlayer);
+      };
+      createPlayer(newPlayer);
     } else {
-      this.props.updatePlayer(playerId, {
+      updatePlayer(playerId, {
         name: name,
         height: height,
       });
@@ -169,6 +177,7 @@ PlayerFile.propTypes = {
     }).isRequired,
   }).isRequired,
   location: PropTypes.string.isRequired,
+  styles: PropTypes.object.isRequired,
 };
 
 PlayerFile.defaultProps = {

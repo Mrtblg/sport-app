@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import PropTypes from 'prop-types';
 import { css, withStyles } from '../../skeleton/ressources/with-styles';
 import thesportdbQueryService from '../../skeleton/services/thesportdb-query.service';
@@ -20,14 +20,14 @@ class Team extends Component {
    * @returns {Array} the array of players sorted
    */
   static parseAPIData(data) {
-    const players = data.player.map((player) => {
-      return Team.parsePlayer({
+    const players = data.player.map(player => (
+      Team.parsePlayer({
         name: player.strPlayer,
         height: player.strHeight,
         uniqId: player.idPlayer,
         teamId: player.idTeam,
-      });
-    });
+      })
+    ));
     Team.sortPlayers(players);
     return players;
   }
@@ -69,7 +69,7 @@ class Team extends Component {
 
   /** fetch players list by interrogating the API with teamID */
   componentWillMount() {
-    const { teamId } = this.props.match.params
+    const { match: { params: { teamId } } } = this.props;
     thesportdbQueryService.query({
       url: `lookup_all_players.php?id=${teamId}`,
     }).then((response) => {
@@ -86,8 +86,9 @@ class Team extends Component {
    * @returns {Object} the found Player
    */
   fetchPlayerById(playerId) {
+    const { players } = this.state;
     let playerResult;
-    this.state.players.forEach((player) => {
+    players.forEach((player) => {
       if (player.uniqId === playerId) {
         playerResult = player;
       }
@@ -102,8 +103,9 @@ class Team extends Component {
    * @param {Object} playerData containing only data handled by playerFile
    */
   updatePlayer(playerId, playerData) {
+    const { players } = this.state;
     const newPlayers = [];
-    this.state.players.forEach((player) => {
+    players.forEach((player) => {
       if (player.uniqId !== playerId) {
         newPlayers.push(player);
       } else {
@@ -125,9 +127,10 @@ class Team extends Component {
    * @param {Boolean} isCurrentPlayer // tels if we neeed to navigate to next player
    */
   deletePlayer(playerId, isCurrentPlayer) {
+    const { players } = this.state;
     const newPlayers = [];
     let playerIndex;
-    this.state.players.forEach((player, index) => {
+    players.forEach((player, index) => {
       if (player.uniqId !== playerId) {
         newPlayers.push(player);
       } else {
@@ -137,10 +140,10 @@ class Team extends Component {
     this.setState({ players: newPlayers });
     // navigate to next player in list if needed
     if (isCurrentPlayer) {
-      const { teamId } = this.props.match.params;
+      const { match: { params: { teamId } }, history } = this.props;
       const newPlayer = playerIndex < newPlayers.length
         ? newPlayers[playerIndex] : newPlayers[newPlayers.length - 1];
-      this.props.history.push(`/team/${teamId}/${newPlayer.uniqId}`);
+      history.push(`/team/${teamId}/${newPlayer.uniqId}`);
     }
   }
 
@@ -151,10 +154,12 @@ class Team extends Component {
    * @param {Object} player the newly created player with it's ID
    */
   createPlayer(player) {
-    const newPlayers = [Team.parsePlayer(player)].concat(this.state.players)
+    const { match: { params: { teamId } }, history } = this.props;
+    const { players } = this.state;
+    const newPlayers = [Team.parsePlayer(player)].concat(players);
     Team.sortPlayers(newPlayers);
     this.setState({ players: newPlayers });
-    this.props.history.push(`/team/${this.props.match.params.teamId}/${player.uniqId}`);
+    history.push(`/team/${teamId}/${player.uniqId}`);
   }
 
   /**
@@ -169,7 +174,7 @@ class Team extends Component {
   render() {
     const { players, selectedPlayerId } = this.state;
     const { styles } = this.props;
-    const { teamId } = this.props.match.params;
+    const { match: { params: { teamId } } } = this.props;
     // display a not found message if the list of players is empty
     if (players === undefined || players.length === 0) {
       return (
@@ -208,18 +213,16 @@ class Team extends Component {
           <Route
             path="/team/:teamId/:playerId"
             render={
-              (props) => {
-                return (
-                  <PlayerFile
-                    {...props}
-                    fetchPlayerById={this.fetchPlayerById}
-                    createPlayer={this.createPlayer}
-                    updatePlayer={this.updatePlayer}
-                    deletePlayer={this.deletePlayer}
-                    selectedPlayerCallback={this.selectedPlayerCallback}
-                  />
-                );
-              }
+              props => (
+                <PlayerFile
+                  {...props}
+                  fetchPlayerById={this.fetchPlayerById}
+                  createPlayer={this.createPlayer}
+                  updatePlayer={this.updatePlayer}
+                  deletePlayer={this.deletePlayer}
+                  selectedPlayerCallback={this.selectedPlayerCallback}
+                />
+              )
             }
           />
         </div>
